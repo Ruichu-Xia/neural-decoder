@@ -1,0 +1,3 @@
+# Ignore all folders named 'data' at any depth
+**/data/
+.DS_Store
