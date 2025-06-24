@@ -1,3 +1,8 @@
 # Ignore all folders named 'data' at any depth
 **/data/
 .DS_Store
+.venv/
+**/checkpoints/
+**/cache/
+**/results/
+**/__pycache__/

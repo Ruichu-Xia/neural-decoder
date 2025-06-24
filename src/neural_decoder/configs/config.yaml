@@ -1,0 +1,5 @@
+data:
+  eeg_dir: "data/thingseeg2_preproc/"
+  train_path: "train_thingseeg2_avg.npy"
+  test_path: "test_thingseeg2_avg.npy"
+  embedding_dir: "cache/thingseeg2_extracted_embeddings/"
