@@ -1,5 +1,38 @@
+seed: 42
+
 data:
   eeg_dir: "data/thingseeg2_preproc/"
+  image_dir: "data/thingseeg2_metadata/"
   train_path: "train_thingseeg2_avg.npy"
   test_path: "test_thingseeg2_avg.npy"
-  embedding_dir: "cache/thingseeg2_extracted_embeddings/"
+  extracted_embedding_dir: "cache/thingseeg2_extracted_embeddings/"
+  predicted_embedding_dir: "cache/thingseeg2_predicted_embeddings/"
+
+model:
+  checkpoint_dir: "checkpoints/"
+  num_channels: 17
+  sequence_length: 80
+  clip_dim: 1024
+  vae_dim: 36864
+  ridge:
+    alpha: 100.0
+    max_iter: 50000
+    fit_intercept: True
+
+evaluation:
+  models:
+    - name: "alexnet"
+      layers: [2, 5]
+    - name: "inceptionv3" 
+      layers: ["avgpool"]
+    - name: "clip"
+      layers: ["final"]
+    - name: "efficientnet"
+      layers: ["avgpool"]
+    - name: "swav"
+      layers: ["avgpool"]
+  batch_size: 64
+  num_test_images: 200
+  image_size: 224
+  result_image_size: 512
+  device_id: 0

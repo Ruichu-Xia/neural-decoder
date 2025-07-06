@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import joblib
 from sklearn.linear_model import Ridge
 
 
@@ -47,3 +46,25 @@ class RidgeWrapper(nn.Module):
             y = y.numpy()
 
         self.ridge.fit(x, y)
+
+    def state_dict(self):
+        """
+        Custom state_dict to save scikit-learn's parameters.
+        """
+        if not hasattr(self.ridge, 'coef_'):
+            return {}
+
+        state = {
+            'coef': torch.from_numpy(self.ridge.coef_),
+        }
+        if self.ridge.fit_intercept:
+            state['intercept'] = torch.from_numpy(np.array(self.ridge.intercept_))
+        return state
+
+    def load_state_dict(self, state_dict):
+        """
+        Custom load_state_dict to load scikit-learn's parameters.
+        """
+        self.ridge.coef_ = state_dict['coef'].cpu().numpy()
+        if 'intercept' in state_dict:
+            self.ridge.intercept_ = state_dict['intercept'].cpu().numpy()

@@ -6,6 +6,11 @@ import numpy as np
 from tqdm import tqdm
 
 from diffusers.pipelines.stable_diffusion.pipeline_stable_unclip_img2img import StableUnCLIPImg2ImgPipeline
+
+from configs.config import load_config
+
+config = load_config()
+
 # device='cuda:0'
 pipe = StableUnCLIPImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-2-1-unclip", torch_dtype=torch.float16, variation="fp16"
@@ -13,7 +18,7 @@ pipe = StableUnCLIPImg2ImgPipeline.from_pretrained(
 pipe = pipe.to('cuda')
 
 # Load the test_images NumPy array
-images = np.load("data/thingseeg2_metadata/test_images.npy", mmap_mode='r')
+images = np.load(f"{config.data.image_dir}test_images.npy", mmap_mode='r')
 
 print('Resizing images')
 # Initialize an empty list to store the resized images
@@ -46,10 +51,10 @@ for i_image, image in tqdm(enumerate(images), total=len(images)):
     vae_latent_np_flatten = vae_latent_np.flatten()
     embeddings[i_image] = vae_latent_np_flatten
 
-np.save('cache/thingseeg2_extracted_embeddings/test_vae.npy', embeddings)
+np.save(f'{config.data.extracted_embedding_dir}test_vae.npy', embeddings)
 
 # Load the train_images NumPy array
-images = np.load("data/thingseeg2_metadata/train_images.npy", mmap_mode='r')
+images = np.load(f"{config.data.image_dir}train_images.npy", mmap_mode='r')
 
 print('Resizing images')
 # Initialize an empty list to store the resized images
@@ -82,4 +87,4 @@ for i_image, image in tqdm(enumerate(images), total=len(images)):
     vae_latent_np_flatten = vae_latent_np.flatten()
     embeddings[i_image] = vae_latent_np_flatten
 
-np.save('cache/thingseeg2_extracted_embeddings/train_vae.npy', embeddings)
+np.save(f'{config.data.extracted_embedding_dir}train_vae.npy', embeddings)

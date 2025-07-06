@@ -63,10 +63,10 @@ def get_dataloaders(
     eeg_train_path = f"{config.data.eeg_dir}sub-{sub_id:02d}/{config.data.train_path}"
     eeg_test_path = f"{config.data.eeg_dir}sub-{sub_id:02d}/{config.data.test_path}"
     eeg_train = np.load(eeg_train_path)
-    norm_mean, norm_std = _calculate_norm_mean_std(eeg_train, flatten_eeg)
+    norm_mean, norm_std = calculate_norm_mean_std(eeg_train, flatten_eeg)
 
-    embedding_train_path = f"{config.data.embedding_dir}train_{embedding_type}.npy"
-    embedding_test_path = f"{config.data.embedding_dir}test_{embedding_type}.npy"
+    embedding_train_path = f"{config.data.extracted_embedding_dir}train_{embedding_type}.npy"
+    embedding_test_path = f"{config.data.extracted_embedding_dir}test_{embedding_type}.npy"
 
     train_dataset = EEGEmbeddingDataset(eeg_train_path, embedding_train_path, norm_mean, norm_std, flatten_eeg=flatten_eeg)
     total_train_samples = len(train_dataset)
@@ -97,50 +97,66 @@ def get_numpy_from_loader(loader):
     
     return eeg_np_flat, embeddings_np
 
-def load_normalized_numpy_data(eeg_path: str, 
-                    embedding_path: str, 
-                    norm_mean: np.ndarray, 
-                    norm_std: np.ndarray, 
-                    flatten_eeg: bool = True):
-    """
-    Load the EEG and embedding data from the given paths.
+# def load_normalized_numpy_data(eeg_path: str, 
+#                     embedding_path: str, 
+#                     norm_mean: np.ndarray, 
+#                     norm_std: np.ndarray, 
+#                     flatten_eeg: bool = True):
+#     """
+#     Load the EEG and embedding data from the given paths.
 
-    Args:
-        eeg_path: The path to the EEG data.
-        embedding_path: The path to the embedding data.
-        norm_mean: The mean of the EEG data.
-        norm_std: The standard deviation of the EEG data.
-        flatten_eeg: Whether to flatten the EEG data.
+#     Args:
+#         eeg_path: The path to the EEG data.
+#         embedding_path: The path to the embedding data.
+#         norm_mean: The mean of the EEG data.
+#         norm_std: The standard deviation of the EEG data.
+#         flatten_eeg: Whether to flatten the EEG data.
 
-    Returns:
-        A tuple containing the EEG and embedding data.
-    """
-    eeg_train_path = f"{config.data.eeg_dir}sub-{sub_id:02d}/{config.data.train_path}"
-    eeg_train = np.load(eeg_path)
-    norm_mean, norm_std = _calculate_norm_mean_std(eeg_train, flatten_eeg)
+#     Returns:
+#         A tuple containing the EEG and embedding data.
+#     """
+#     eeg_train_path = f"{config.data.eeg_dir}sub-{sub_id:02d}/{config.data.train_path}"
+#     eeg_train = np.load(eeg_path)
+#     norm_mean, norm_std = _calculate_norm_mean_std(eeg_train, flatten_eeg)
 
-    if flatten_eeg:
+#     if flatten_eeg:
 
-def _calculate_norm_mean_std(eeg_train: np.ndarray, flatten_eeg: bool = True) -> tuple[np.ndarray, np.ndarray]:
+def calculate_norm_mean_std(data: np.ndarray, flatten: bool = True) -> tuple[np.ndarray, np.ndarray]:
     """
     Helper function to calculate the mean and standard deviation of the EEG data.
 
     Args:
-        eeg_train: The EEG data.
-        flatten_eeg: Whether to flatten the EEG data.
+        data: The data to calculate the mean and std.
+        flatten: Whether to flatten the data.
 
     Returns:
-        A tuple containing the mean and standard deviation of the EEG data.
+        A tuple containing the mean and standard deviation of the given data.
     """
-    if flatten_eeg:
-        eeg_train_reshaped = eeg_train.reshape(eeg_train.shape[0], -1)
-        norm_mean = np.mean(eeg_train_reshaped, axis=0)
-        norm_std = np.std(eeg_train_reshaped, axis=0, ddof=1)
+    if flatten:
+        data_reshaped = data.reshape(data.shape[0], -1)
+        norm_mean = np.mean(data_reshaped, axis=0)
+        norm_std = np.std(data_reshaped, axis=0, ddof=1)
     else:
-        norm_mean = np.mean(eeg_train, axis=(0, 2))
-        norm_std = np.std(eeg_train, axis=(0, 2), ddof=1)
+        norm_mean = np.mean(data, axis=(0, 2))
+        norm_std = np.std(data, axis=(0, 2), ddof=1)
 
         norm_std[norm_std == 0] = 1e-8
 
     return norm_mean, norm_std
-    
+
+def match_latent_distribution(pred_latent: np.ndarray, target_latent: np.ndarray) -> np.ndarray:
+    """
+    Match the distribution of the predicted latent to the target latent.
+
+    Args:
+        pred_latent: The predicted latent.
+        target_latent: The target latent.
+
+    Returns:
+        The predicted latent with the same distribution as the target latent.
+    """
+    pred_latent_mean, pred_latent_std = calculate_norm_mean_std(pred_latent, flatten=True)
+    target_latent_mean, target_latent_std = calculate_norm_mean_std(target_latent, flatten=True)
+    std_norm_pred_latent = (pred_latent - pred_latent_mean) / pred_latent_std
+    pred_latent = std_norm_pred_latent * target_latent_std + target_latent_mean
+    return pred_latent
