@@ -97,19 +97,17 @@ def train_model(model,
 
 def evaluate_model(model, data_loader, device, loss_fn):
     """Calculates the average MSE for a model on a given data loader."""
-    model.eval()  # Set the model to evaluation mode
+    model.eval()
     total_loss = 0.0
-    with torch.no_grad(): # Disable gradient calculation
+    with torch.no_grad():
         for eeg_batch, embedding_batch in data_loader:
             eeg_batch = eeg_batch.to(device)
             embedding_batch = embedding_batch.to(device)
             
-            # Get model prediction
             prediction = model(eeg_batch)
             
-            # Calculate loss
             loss = loss_fn(prediction, embedding_batch)
-            total_loss += loss.item() * eeg_batch.size(0) # Multiply by batch size
+            total_loss += loss.item() * eeg_batch.size(0)
 
     return total_loss / len(data_loader.dataset)
 

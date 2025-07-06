@@ -64,7 +64,7 @@ A neural decoder for reconstructing visual images from EEG signals using the thi
 3. **Process the data:**
    ```bash
    cd ../
-   python src/neural_decoder/scripts/dataprep.py
+   uv run python -m src.neural_decoder.scripts.dataprep
    ```
 
 ## Usage
@@ -75,10 +75,10 @@ Extract CLIP and VAE embeddings from the images:
 
 ```bash
 # Extract CLIP features
-python src/neural_decoder/scripts/extract_clip.py
+uv run python -m src.neural_decoder.scripts.extract_clip
 
 # Extract VAE features  
-python src/neural_decoder/scripts/extract_vae.py
+uv run python -m src.neural_decoder.scripts.extract_vae
 ```
 
 ### 2. Train Models
@@ -87,13 +87,13 @@ Train different neural network architectures:
 
 ```bash
 # Train Ridge regression (baseline)
-python src/neural_decoder/scripts/train_ridge.py --sub_id 1
+uv run python -m src.neural_decoder.scripts.train_ridge --sub_id 1
 
 # Train MLP
-python src/neural_decoder/scripts/train_nn.py --sub_id 1 --model_name mlp
+uv run python -m src.neural_decoder.scripts.train_nn --sub_id 1 --model_name mlp
 
 # Train CNN
-python src/neural_decoder/scripts/train_nn.py --sub_id 1 --model_name cnn
+uv run python -m src.neural_decoder.scripts.train_nn --sub_id 1 --model_name cnn
 ```
 
 ### 3. Generate Predictions
@@ -101,8 +101,8 @@ python src/neural_decoder/scripts/train_nn.py --sub_id 1 --model_name cnn
 Generate latent embeddings for test images:
 
 ```bash
-python src/neural_decoder/scripts/predict_latent.py --sub_id 1 --model_name ridge
-python src/neural_decoder/scripts/predict_latent.py --sub_id 1 --model_name mlp
+uv run python -m src.neural_decoder.scripts.predict_latent --sub_id 1 --model_name ridge
+uv run python -m src.neural_decoder.scripts.predict_latent --sub_id 1 --model_name mlp
 ```
 
 ### 4. Reconstruct Images
@@ -110,8 +110,8 @@ python src/neural_decoder/scripts/predict_latent.py --sub_id 1 --model_name mlp
 Generate images from predicted embeddings:
 
 ```bash
-python src/neural_decoder/scripts/generate_image.py --sub_id 1 --model_name ridge
-python src/neural_decoder/scripts/generate_image.py --sub_id 1 --model_name mlp
+uv run python -m src.neural_decoder.scripts.generate_image --sub_id 1 --model_name ridge
+uv run python -m src.neural_decoder.scripts.generate_image --sub_id 1 --model_name mlp
 ```
 
 ### 5. Evaluate Results
@@ -120,10 +120,10 @@ Evaluate reconstruction quality with multiple metrics:
 
 ```bash
 # First run (extracts features)
-python src/neural_decoder/scripts/evaluate_reconstruction.py --sub_id 1 --model_name ridge --extract_features
+uv run python -m src.neural_decoder.scripts.evaluate_reconstruction --sub_id 1 --model_name ridge --extract_features
 
 # Subsequent runs (uses cached features)
-python src/neural_decoder/scripts/evaluate_reconstruction.py --sub_id 1 --model_name ridge
+uv run python -m src.neural_decoder.scripts.evaluate_reconstruction --sub_id 1 --model_name ridge
 ```
 
 ## Project Structure
@@ -131,6 +131,10 @@ python src/neural_decoder/scripts/evaluate_reconstruction.py --sub_id 1 --model_
 ```
 neural-decoder/
 ├── src/neural_decoder/
+│   ├── cache/               # Cached features
+│   ├── data/                # Dataset directory
+│   ├── results/             # Generated images and results
+│   ├── checkpoints/         # Model checkpoints
 │   ├── models/              # Neural network architectures
 │   │   ├── ridge.py         # Ridge regression baseline
 │   │   ├── mlp.py           # Multi-layer perceptron
@@ -147,9 +151,6 @@ neural-decoder/
 │   ├── data_utils.py        # Data loading utilities
 │   ├── model_utils.py       # Model training utilities
 │   └── evaluation_utils.py  # Evaluation metrics
-├── data/                    # Dataset directory
-├── results/                 # Generated images and results
-└── cache/                   # Cached features
 ```
 
 ## Evaluation metrics
