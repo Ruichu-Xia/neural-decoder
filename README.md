@@ -2,9 +2,11 @@
 
 A neural decoder for reconstructing visual images from EEG signals using the thingseeg2 dataset. This project trains various neural network architectures to decode EEG recordings into CLIP and VAE embeddings, which are then used to generate images via StableUnCLIP.
 
+## Sample results
 ![Reconstruction Examples](src/neural_decoder/reconstruction_examples.png)
 
 ![Reconstruction Examples Random](src/neural_decoder/reconstruction_examples_random.png)
+
 
 ### Prerequisites
 - Python 3.12 or higher
@@ -150,7 +152,7 @@ neural-decoder/
 └── cache/                   # Cached features
 ```
 
-## Results
+## Evaluation metrics
 
 The project evaluates reconstruction quality using multiple metrics:
 
@@ -160,14 +162,6 @@ The project evaluates reconstruction quality using multiple metrics:
 - **FID**: Fréchet Inception Distance
 - **Neural Network Similarities**: AlexNet, InceptionV3, EfficientNet, SwAV
 
-### Reconstruction Examples
-
-![Reconstruction Examples](src/neural_decoder/reconstruction_examples.png)
-
-*Examples of original test images (top row) and their reconstructions (bottom row) using the neural decoder.*
-
-### Performance Metrics
-
 Based on the evaluation summary, Ridge regression currently performs best with:
 - Pixel correlation: 0.2522
 - SSIM: 0.3753
@@ -176,7 +170,3 @@ Based on the evaluation summary, Ridge regression currently performs best with:
 
 ## Requirements
 See `pyproject.toml` for the complete list of dependencies.
-
-## License
-
-[Add your license information here]
