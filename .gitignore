@@ -6,3 +6,4 @@
 **/cache/
 **/results/
 **/__pycache__/
+*.ipynb
